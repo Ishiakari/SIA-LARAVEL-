@@ -23,6 +23,10 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                            @php
+                                $avatarNumber = (Auth::user()->id % 4) + 1;
+                            @endphp
+                            <img src="{{ asset('images/avatars/AVATAR (' . $avatarNumber . ').png') }}" alt="User Avatar" class="rounded-full mr-7" style="width: 32px; height: 32px; max-width: 32px; max-height: 32px; object-fit: cover;">
                             <div>{{ Auth::user()->name }}</div>
 
                             <div class="ms-1">
@@ -74,9 +78,15 @@
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+            <div class="px-4 flex items-center">
+                @php
+                    $avatarNumber = (Auth::user()->id % 4) + 1;
+                @endphp
+                <img src="{{ asset('images/avatars/AVATAR (' . $avatarNumber . ').png') }}" alt="User Avatar" class="rounded-full mr-3" style="width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: cover;">
+                <div>
+                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
+                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                </div>
             </div>
 
             <div class="mt-3 space-y-1">
