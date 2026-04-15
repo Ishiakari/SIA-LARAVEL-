@@ -4,13 +4,35 @@ namespace App\Http\Controllers;
 
 use App\Models\customers;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf; // 👈 Add this for PDF generation
 
 class CustomersController extends Controller
 {
-    public function index() {
-        $customers = customers::all();
+    // UPDATED: Added Request $request to handle search input
+    public function index(Request $request) 
+    {
+        $search = $request->input('search');
+
+        // Logic for Search and Pagination (5 records per page)
+        $customers = customers::when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('address', 'like', "%{$search}%");
+            })
+            ->paginate(5) // 👈 Pagination
+            ->withQueryString(); // 👈 Keeps search terms in pagination links
+
         return view('customers.index', compact('customers'));
     }
+
+    // NEW: Method for PDF Generation
+    public function exportPdf()
+    {
+        $customers = customers::all();
+        $pdf = Pdf::loadView('customers.pdf', compact('customers'));
+        return $pdf->download('customer-report.pdf');
+    }
+
+    /* --- Keep your existing create, store, edit, update, and destroy methods below --- */
 
     public function create() {
         return view('customers.create');

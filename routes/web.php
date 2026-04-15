@@ -13,8 +13,15 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// 2. The Customers CRUD (This handles index, create, store, edit, etc. automatically)
-Route::resource('customers', CustomersController::class)->middleware(['auth', 'verified']);
+// --- CUSTOMER SECTION START ---
+
+// Place the Export route BEFORE the Resource route
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/customers/export', [CustomersController::class, 'exportPdf'])->name('customers.export');
+    Route::resource('customers', CustomersController::class);
+});
+
+// --- CUSTOMER SECTION END ---
 
 // 3. Profile Routes
 Route::middleware('auth')->group(function () {
