@@ -9,11 +9,16 @@ class customers extends Model
 {
     use HasFactory;
 
-    // This tells Laravel exactly which columns can be filled by the user
     protected $fillable = [
         'name', 
         'address', 
         'gender', 
         'dob'
     ];
+
+    // Activity 13: One Customer has many Loan Transactions
+    public function loanTransactions()
+    {
+        return $this->hasMany(LoanTransaction::class, 'customer_id');
+    }
 }
