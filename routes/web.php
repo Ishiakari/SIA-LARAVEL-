@@ -10,32 +10,26 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// 1. The Dashboard
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-// --- ACTIVITY 13: RELATIONAL MODULES START ---
-
+// Accessible by everyone authenticated
 Route::middleware(['auth', 'verified'])->group(function () {
-    
-    // CUSTOMERS (Master Table 1)
-    Route::get('/customers/export', [CustomersController::class, 'exportPdf'])->name('customers.export');
-    Route::resource('customers', CustomersController::class);
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
 
-    // LOANS (Master Table 2)
-    Route::resource('loans', LoanController::class);
+    // ADMIN ONLY: Transactions and PDF Exports
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/loantransactions/pdf', [LoanTransactionController::class, 'generatePDF'])->name('transactions.pdf');
+        Route::resource('loantransactions', LoanTransactionController::class);
+        Route::get('/customers/export', [CustomersController::class, 'exportPdf'])->name('customers.export');
+    });
 
-    // LOAN TRANSACTIONS (Transaction Table)
-    // The PDF route must come BEFORE the resource route to avoid ID conflicts
-    Route::get('/loantransactions/pdf', [LoanTransactionController::class, 'generatePDF'])->name('transactions.pdf');
-    Route::resource('loantransactions', LoanTransactionController::class);
-
+    // ADMIN & STAFF: Manage Customers and Loans
+    Route::middleware(['role:admin,staff'])->group(function () {
+        Route::resource('customers', CustomersController::class);
+        Route::resource('loans', LoanController::class);
+    });
 });
 
-// --- ACTIVITY 13: RELATIONAL MODULES END ---
-
-// 3. Profile Routes
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

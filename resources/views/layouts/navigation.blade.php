@@ -12,15 +12,23 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('customers.index')" :active="request()->routeIs('customers.*')">
-                        {{ __('Customers') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('loans.index')" :active="request()->routeIs('loans.*')">
-                        {{ __('Loans') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('loantransactions.index')" :active="request()->routeIs('loantransactions.*')">
-                        {{ __('Transactions') }}
-                    </x-nav-link>
+
+                    {{-- Visible to Admin and Staff --}}
+                    @if(auth()->user()->role === 'admin' || auth()->user()->role === 'staff')
+                        <x-nav-link :href="route('customers.index')" :active="request()->routeIs('customers.*')">
+                            {{ __('Customers') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('loans.index')" :active="request()->routeIs('loans.*')">
+                            {{ __('Loans') }}
+                        </x-nav-link>
+                    @endif
+
+                    {{-- Only Visible to Admin --}}
+                    @if(auth()->user()->role === 'admin')
+                        <x-nav-link :href="route('loantransactions.index')" :active="request()->routeIs('loantransactions.*')">
+                            {{ __('Transactions') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -35,7 +43,7 @@
                                 <img src="{{ asset('images/avatars/default-avatar.png') }}" class="rounded-full object-cover border me-2" style="width: 28px; height: 28px;" alt="Default Avatar">
                             @endif
 
-                            <div>{{ Auth::user()->name }}</div>
+                            <div>{{ Auth::user()->name }} <span class="text-xs text-gray-400">({{ ucfirst(Auth::user()->role) }})</span></div>
 
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -46,10 +54,17 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">{{ __('Profile') }}</x-dropdown-link>
+                        <x-dropdown-link :href="route('profile.edit')">
+                            {{ __('Profile') }}
+                        </x-dropdown-link>
+
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">{{ __('Log Out') }}</x-dropdown-link>
+                            <x-dropdown-link :href="route('logout')"
+                                    onclick="event.preventDefault();
+                                                this.closest('form').submit();">
+                                {{ __('Log Out') }}
+                            </x-dropdown-link>
                         </form>
                     </x-slot>
                 </x-dropdown>
@@ -68,32 +83,56 @@
 
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">{{ __('Dashboard') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('customers.index')" :active="request()->routeIs('customers.*')">{{ __('Customers') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('loans.index')" :active="request()->routeIs('loans.*')">{{ __('Loans') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('loantransactions.index')" :active="request()->routeIs('loantransactions.*')">{{ __('Transactions') }}</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+
+            {{-- Visible to Admin and Staff --}}
+            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'staff')
+                <x-responsive-nav-link :href="route('customers.index')" :active="request()->routeIs('customers.*')">
+                    {{ __('Customers') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('loans.index')" :active="request()->routeIs('loans.*')">
+                    {{ __('Loans') }}
+                </x-responsive-nav-link>
+            @endif
+
+            {{-- Only Visible to Admin --}}
+            @if(auth()->user()->role === 'admin')
+                <x-responsive-nav-link :href="route('loantransactions.index')" :active="request()->routeIs('loantransactions.*')">
+                    {{ __('Transactions') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4 flex items-center">
-                
-                @if(auth()->user()->avatar)
-                    <img src="{{ asset('storage/' . auth()->user()->avatar) }}" class="rounded-full object-cover border mr-3" style="width: 32px; height: 32px;" alt="User Avatar">
-                @else
-                    <img src="{{ asset('images/avatars/default-avatar.png') }}" class="rounded-full object-cover border mr-3" style="width: 32px; height: 32px;" alt="Default Avatar">
-                @endif
+                <div class="shrink-0">
+                    @if(auth()->user()->avatar)
+                        <img src="{{ asset('storage/' . auth()->user()->avatar) }}" class="rounded-full object-cover border" style="width: 32px; height: 32px;" alt="User Avatar">
+                    @else
+                        <img src="{{ asset('images/avatars/default-avatar.png') }}" class="rounded-full object-cover border" style="width: 32px; height: 32px;" alt="Default Avatar">
+                    @endif
+                </div>
 
-                <div>
+                <div class="ms-3">
                     <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
                     <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
                 </div>
             </div>
-            
+
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">{{ __('Profile') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('profile.edit')">
+                    {{ __('Profile') }}
+                </x-responsive-nav-link>
+
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">{{ __('Log Out') }}</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('logout')"
+                            onclick="event.preventDefault();
+                                        this.closest('form').submit();">
+                        {{ __('Log Out') }}
+                    </x-responsive-nav-link>
                 </form>
             </div>
         </div>
